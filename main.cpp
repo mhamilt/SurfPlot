@@ -20,7 +20,7 @@
 #include "../FDTD_Classes/FDPlate.hpp"
 
 //==============================================================================
-// Global scope for these is note ideal
+// Global scope for these is not ideal
 // consider bundling this and other methods in a class.
 
 FDPlate plate;
