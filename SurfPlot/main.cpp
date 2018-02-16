@@ -24,7 +24,7 @@
 //#include <GL/glut.h>
 //#include <GLUT/glut.h>
 //==============================================================================
-// Global scope for these is note ideal
+// Global scope for these is not ideal
 // consider bundling this and other methods in a class.
 
 FDPlate plate;
@@ -66,7 +66,7 @@ static void key (int key, int x, int y)
             exit (0);
             break;
         case GLUT_KEY_F1: // F1 to restart
-//            plate.setInitialCondition();
+            //            plate.setInitialCondition();
             plate.addStrike();
             break;
     }
@@ -85,7 +85,7 @@ void display ()
 //==============================================================================
 void init ()
 {
-        glEnable (GL_DEPTH_TEST|GL_COLOR_MATERIAL);
+    glEnable (GL_DEPTH_TEST|GL_COLOR_MATERIAL);
     glMatrixMode (GL_MODELVIEW);
     gluPerspective (45.0, 1.0, 1.0, 250.0);
     gluLookAt ( -45.0,   45.0, 45.0,// eye
@@ -97,7 +97,7 @@ void init ()
 int main (int argc, char* argv[])
 {
     plate.setup (44100, true);
-    plate.setLoss(.5, .9);
+    plate.setLoss(.1, .9);
     plate.setInitialCondition();
     glutInit (&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -114,8 +114,8 @@ void draw ()
 {
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glRasterPos3f(-8.5, 20, 0);
-
-    const unsigned char string[] = "The quick god jumps over the lazy brown fox.";
+    
+    const unsigned char string[] = "FDTD Thin Plate: Press F1 to Strike, esc to quit";
     for (const unsigned char* c = string; *c != '\0'; c++)
     {
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
@@ -129,7 +129,7 @@ void draw ()
     
     glVertex3f (0., 0., 0.);
     glVertex3f (0., 10., 0.);
-
+    
     glVertex3f (0., 0., 0.);
     glVertex3f (0., 0., 10.);
     
@@ -167,7 +167,7 @@ void draw ()
             glEnd ();
         }
     }
-
+    
     glutPostRedisplay ();
 }
 

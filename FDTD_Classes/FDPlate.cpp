@@ -459,7 +459,7 @@ void FDPlate::setInitialCondition()
 			const int cp = yi+(xi * Ny);
 			const double Y = yi*h;
 			const double dist = sqrt (pow (X-(ctr[0]*Lx),2) + pow (Y-(ctr[1]*Ly),2));
-			const int ind = sgn((wid*0.5)-dist);			// displacement (logical)
+			const int ind = sgn((wid*0.5)-dist);              // displacement (logical)
             const double rc = .5*ind*(1+cos (2*pi*dist/wid)); // displacement
             if (ind != 0)
             {
@@ -470,8 +470,6 @@ void FDPlate::setInitialCondition()
 			u1[cp] = v0*k*rc;
 		}
 	}
-    
-    
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

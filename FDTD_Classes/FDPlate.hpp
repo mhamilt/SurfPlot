@@ -287,7 +287,6 @@ private: // Variables
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Strike Parameters
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    std::vector<double> rcDistance;
     std::vector<double> rcValue;
     std::vector<int> rcIndex;
     
