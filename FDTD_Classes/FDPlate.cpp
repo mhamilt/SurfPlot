@@ -7,7 +7,7 @@
 //
 //  Class file for a FDTD Plate
 
-#include "PlateClass.hpp"
+#include "FDPlate.hpp"
 
 FDPlate::FDPlate()
 {
@@ -433,9 +433,9 @@ void FDPlate::setStereoOutput (double lxcoord, double lycoord)
 // Method sets the output type, either velocity or, amplitude. Can probably be
 // intergrated into the get output method.
 
-void FDPlate::setOutType (bool outtype)
+void FDPlate::setOutType (bool outType)
 {
-	outFlag = outtype;  // set output to velocity amplitude
+	outFlag = outType;  // set output to velocity amplitude
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -459,12 +459,19 @@ void FDPlate::setInitialCondition()
 			const int cp = yi+(xi * Ny);
 			const double Y = yi*h;
 			const double dist = sqrt (pow (X-(ctr[0]*Lx),2) + pow (Y-(ctr[1]*Ly),2));
-			const double ind = sgn((wid*0.5)-dist);			// displacement (logical)
-			const double rc = .5*ind*(1+cos (2*pi*dist/wid)); // displacement
+			const int ind = sgn((wid*0.5)-dist);			// displacement (logical)
+            const double rc = .5*ind*(1+cos (2*pi*dist/wid)); // displacement
+            if (ind != 0)
+            {
+                rcValue.push_back(rc);
+                rcIndex.push_back(cp);
+            }
 			u2[cp] = u0*rc;
 			u1[cp] = v0*k*rc;
 		}
 	}
+    
+    
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -483,6 +490,11 @@ void FDPlate::addStrike()
 	// calculate gain rc based on velocity.
 	// prepare for multiple strikes, potentially overlapping.
 	
+    for (int i = 0; i < rcIndex.size(); ++i)
+    {
+        u1[rcIndex[i]] += k*rcValue[i];
+    }
+    
 	// Need to work out in advance which indeces will actually be affected by a strike.
 }
 
@@ -510,7 +522,7 @@ double FDPlate::getInterpOut()
 			// out of bound test to mark point as zero
 			if (yInterpIndeces[yi] < 0 || yInterpIndeces[yi] > Ny || xInterpIndeces[xi] < 0 || xInterpIndeces[xi] > Nx)
 			{
-//				hiResValue += 0;
+                // hiResValue += 0;
 			}
 			else
 			{
@@ -556,28 +568,17 @@ double FDPlate::getInterpOut()
 
 void FDPlate::setInterpOut (const double xCoord, const double yCoord)
 {
-//	lo = (Ny*(xCoord*Nx)) +  (yCoord*Ny);
-
 	const int order = interpOrder;
-	for (int i = 0; i < order;++i)
+
+    for (int i = 0; i < order;++i)
 	{
 		xInterpIndeces[i] = (i+1 - order/2.) + floor (xCoord*(Nx));
 		yInterpIndeces[i] = (i+1 - order/2.) + floor (yCoord*(Ny-1));
-//		printf("Y: %d \t X: %d \t I: %d\n",yInterpIndeces[i],xInterpIndeces[i],int (i+1 - order/2.));
 	}
-//	printf("\n");
-//	printf("Y: %d \t X: %d\n",yInterpIndeces[i],xInterpIndeces[i]);
-	
-	
-	interpPointY = (yCoord*(Ny-1));
-	interpPointX = (xCoord*Nx);
 
-//	printf("Y: %.2f \t X: %.2f\n",interpPointY,interpPointX);
-//	printf("lo: %d \t Y: %f \t Alpha: %.2f \n",yInterpIndeces[1] +  xInterpIndeces[1]*Ny,yCoord,interpPointY-floor (interpPointY));
-	
-	
-//		const int order = interpOrder;
-	const int res = interpRes;
+    interpPointY = (yCoord*(Ny-1));
+	interpPointX = (xCoord*Nx);
+    const int res = interpRes;
 	xAlphaIndex = floor((interpPointX-floor (interpPointX))*res);
 	yAlphaIndex = floor((interpPointY-floor (interpPointY))*res);
 }

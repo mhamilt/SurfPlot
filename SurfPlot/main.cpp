@@ -96,7 +96,7 @@ void init ()
 //==============================================================================
 int main (int argc, char* argv[])
 {
-    plate.setup (48000, true);
+    plate.setup (44100, true);
     plate.setLoss(.5, .9);
     plate.setInitialCondition();
     glutInit (&argc, argv);

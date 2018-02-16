@@ -16,6 +16,7 @@
 #define PlateClasshpp
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 class FDPlate
 {
@@ -51,31 +52,22 @@ public:
 	/**
 	 <#Description#>
 
-	 @param lowt60 <#lowt60 description#>
-	 @param hight60percent <#hight60percent description#>
+	 @param lowT60 <#lowT60 description#>
+	 @param highT60percent <#highT60percent description#>
 	 */
-	void setLoss (double lowt60, double hight60percent);
+	void setLoss (double lowT60, double highT60percent);
 	/**
-	 <#Description#>
-
-	 @param bcType <#bcType description#>
-	 */
-	void setCoefs (bool bcType);
-	/**
-	 <#Description#>
-	 */
-	void setGrid();
-	/**
-	 <#Description#>
+	 set the plate to an initial condition of a raised cosine. This will overwrite
+     all current values held on the plate.
 	 */
 	void setInitialCondition();
+    //==============================================================================
 	/**
 	 <#Description#>
 
 	 @param xcoord <#xcoord description#>
 	 @param ycoord <#ycoord description#>
 	 */
-    //==============================================================================
 	void setOutput (double xcoord, double ycoord);
 	/**
 	 <#Description#>
@@ -139,7 +131,7 @@ public:
 	 */
 	void addForce (double force);
 	/**
-	 <#Description#>
+	 Under construction: will add a strike to the plate.
 	 */
 	void addStrike();
     //==============================================================================
@@ -160,23 +152,30 @@ public:
 	/**
 	 <#Description#>
 
-	 @param double <#double description#>
+	 @param val <#val description#>
 	 @return <#return value description#>
 	 */
-	int sgn (double);
+	int sgn (double val);
 	
 private: /// Methods
     //==============================================================================
-	//	void updateInternal();
-	//	void updateSides();
-	//	void updateCorners();
-	
 	/**
 	 <#Description#>
 
 	 @return <#return value description#>
 	 */
 	double** getInterpLookTable();
+    //==============================================================================
+    /**
+     <#Description#>
+     
+     @param bcType <#bcType description#>
+     */
+    void setCoefs (bool bcType);
+    /**
+     <#Description#>
+     */
+    void setGrid();
 
 public: // Variables
     //==============================================================================
@@ -258,7 +257,6 @@ private: // Variables
     /**Poisson Ratios (< .5)*/
 	double nu;
     
-	
 	// I/O Parameters
     /**readout position as percentage.*/
 	double rp[4];
@@ -285,7 +283,14 @@ private: // Variables
 	// coefficients are named based on position on the x and y axes.
     /***/
 	double A00, B00, B01, B11, B02, BC1, BC2, C00, C01, d0;
-	
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Strike Parameters
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    std::vector<double> rcDistance;
+    std::vector<double> rcValue;
+    std::vector<int> rcIndex;
+    
 };
 
 
