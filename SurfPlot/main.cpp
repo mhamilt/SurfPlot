@@ -16,11 +16,15 @@
 
 #include <iostream>
 #include <cmath>
-#include <GLUT/glut.h>
+#include <cstring>
 #include "../FDTD_Classes/FDPlate.hpp"
 
+//GLUT versions
+#include <GL/freeglut.h>
+//#include <GL/glut.h>
+//#include <GLUT/glut.h>
 //==============================================================================
-// Global scope for these is not ideal
+// Global scope for these is note ideal
 // consider bundling this and other methods in a class.
 
 FDPlate plate;
@@ -62,7 +66,8 @@ static void key (int key, int x, int y)
             exit (0);
             break;
         case GLUT_KEY_F1: // F1 to restart
-            plate.setInitialCondition();
+//            plate.setInitialCondition();
+            plate.addStrike();
             break;
     }
     glutPostRedisplay();
@@ -80,18 +85,19 @@ void display ()
 //==============================================================================
 void init ()
 {
-    
-    glEnable (GL_DEPTH_TEST);
+        glEnable (GL_DEPTH_TEST|GL_COLOR_MATERIAL);
     glMatrixMode (GL_MODELVIEW);
     gluPerspective (45.0, 1.0, 1.0, 250.0);
-    gluLookAt ( 45.0,   45.0, -40.0, // eye
-               0.0,   0.0,    0.0, // centre
-               0.0,   1.0,   0.0);// up
+    gluLookAt ( -45.0,   45.0, 45.0,// eye
+               0.0,   0.0,    0.0,  // centre
+               0.0,   1.0,   0.0);  // up
 }
+
 //==============================================================================
 int main (int argc, char* argv[])
 {
-    plate.setup (44100, false);
+    plate.setup (48000, true);
+    plate.setLoss(.5, .9);
     plate.setInitialCondition();
     glutInit (&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -106,7 +112,29 @@ int main (int argc, char* argv[])
 //==============================================================================
 void draw ()
 {
-    glRotatef (rot, rotx, roty, rotz);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glRasterPos3f(-8.5, 20, 0);
+
+    const unsigned char string[] = "The quick god jumps over the lazy brown fox.";
+    for (const unsigned char* c = string; *c != '\0'; c++)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
+    }
+    
+    glColor4f(.3f, .3f, .3f, 1.0f);
+    glBegin (GL_LINES);
+    
+    glVertex3f (0., 0., 0.);
+    glVertex3f (10., 0., 0.);
+    
+    glVertex3f (0., 0., 0.);
+    glVertex3f (0., 10., 0.);
+
+    glVertex3f (0., 0., 0.);
+    glVertex3f (0., 0., 10.);
+    
+    glEnd();
+    
     //==========================================================================
     // none of this is ideal
     plate.updateScheme();
@@ -121,19 +149,21 @@ void draw ()
     
     // NOTE: centre of the window is (0,0,0) so X and Z must be adjusted
     // hence surfX and surfZ
-    for (int x = 0; x < xPointNum-1; ++x)
+    glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+    glRotatef (rot, rotx, roty, rotz);
+    const float amp =  5e4;
+    for (int x = 0; x < xPointNum; ++x)
     {
         const float surfX = (float)x - ((float)xPointNum*.5);
-        for (int z = 0; z < zPointNum-1; ++z)
+        for (int z = 0; z < zPointNum; ++z)
         {
             const float surfZ = (float)z - ((float)zPointNum*.5);
             const int cp =  int(x + (z * zPointNum));
-            glBegin (GL_LINE_STRIP);
-            glVertex3f (surfX, 1e5*plateSurf[cp], surfZ);
-            glVertex3f (surfX, 1e5*plateSurf[cp+zPointNum], surfZ+1);
-            glVertex3f (surfX+1, 1e5*plateSurf[cp+zPointNum+1], surfZ+1);
-            glVertex3f (surfX+1, 1e5*plateSurf[cp+1], surfZ);
-            glVertex3f (surfX, 1e5*plateSurf[cp], surfZ);
+            glBegin (GL_LINE_LOOP);
+            glVertex3f (surfX, amp*plateSurf[cp], surfZ);
+            glVertex3f (surfX, amp*plateSurf[cp+zPointNum], surfZ+1);
+            glVertex3f (surfX+1, amp*plateSurf[cp+zPointNum+1], surfZ+1);
+            glVertex3f (surfX+1, amp*plateSurf[cp+1], surfZ);
             glEnd ();
         }
     }
