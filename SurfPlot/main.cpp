@@ -17,25 +17,116 @@
 #include <iostream>
 #include <cmath>
 #include <cstring>
-#include "../FDTD_Classes/FDPlate.hpp"
+
+#include <GL/glew.h>
+#include <glfw3.h>
+//#include <OpenGL/gl3.h>
+
+// Include GLM
+//#include <glm/glm.hpp>
 
 //GLUT versions
-#include <GL/freeglut.h>
+//#include <GL/freeglut.h>
 //#include <GL/glut.h>
-//#include <GLUT/glut.h>
+#include <GLUT/glut.h>
+
+//
+#include "../FDTD_Classes/FDPlate.hpp"
+#include "../common/shader.hpp"
 //==============================================================================
 // Global scope for these is not ideal
 // consider bundling this and other methods in a class.
 
 FDPlate plate;
 float rot, rotx, roty, rotz;
+float zoom = 0;
+GLfloat currentEyeX = 45., currentEyeY = 45., currentEyeZ = 45.;
+
+//==============================================================================
+static const GLfloat g_vertex_buffer_data[] =
+{
+    -1.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+    0.0f,  1.0f, 0.0f,
+};
+
+GLuint vertexbuffer;
+GLuint VertexArrayID;
+GLuint programID;
+//==============================================================================
+
+/**
+ Get the 3D normal of a triangular plane from it's three vertices
+
+ @return the triangle normal as a pointer to a GLfloat array with 3 elements
+ */
+GLfloat* getTriNormal (const GLfloat* pointOne, const GLfloat* pointTwo, const GLfloat* pointThree)
+{
+    const GLfloat v1[3] = { pointTwo[0]-pointOne[0],
+        pointTwo[1]-pointOne[1],
+        pointTwo[1]-pointOne[0]};
+    
+    const GLfloat v2[3] = { pointThree[0]-pointOne[0],
+        pointThree[1]-pointOne[1],
+        pointThree[1]-pointOne[0]};
+    
+    static GLfloat triNorm[3] = { (v1[1]*v2[2] - v2[1]*v1[2]),
+        -(v1[0]*v2[2] - v2[0]*v1[2]),
+        (v1[0]*v2[1] - v2[0]*v1[1])};
+    
+    
+    return triNorm;
+    
+}
+
+//==============================================================================
+
+void drawTriangle (const GLfloat* pointOne, const GLfloat* pointTwo, const GLfloat* pointThree)
+{
+    glBegin (GL_TRIANGLES);
+    glVertex3fv (pointOne);
+    glVertex3fv (pointTwo);
+    glVertex3fv (pointThree);
+    glEnd ();
+}
+
+/**
+ Draw a Qaud outline from 4 points, moving clockwise or anti-clockwise
+ */
+void drawQuad (const GLfloat* pointOne, const GLfloat* pointTwo, const GLfloat* pointThree, const GLfloat* pointFour)
+{
+    glBegin (GL_LINE_LOOP);
+    glVertex3fv (pointOne);
+    glVertex3fv (pointTwo);
+    glVertex3fv (pointThree);
+    glVertex3fv (pointFour);
+    glEnd();
+}
+
+/**
+ Draw x, y, z Axis with a given length
+ */
+void drawAxes (const GLfloat length)
+{
+        glBegin (GL_LINES);
+        //x
+        glVertex3f (0., 0., 0.);
+        glVertex3f (length, 0., 0.);
+        //y
+        glVertex3f (0., 0., 0.);
+        glVertex3f (0., length, 0.);
+        //z
+        glVertex3f (0., 0., 0.);
+        glVertex3f (0., 0., length);
+        
+        glEnd();
+}
 
 //==============================================================================
 static void key (int key, int x, int y)
 {
     switch (key)
     {
-            
         case GLUT_KEY_LEFT:
             rot = -1;
             rotx = 0;
@@ -51,23 +142,26 @@ static void key (int key, int x, int y)
             break;
             
         case GLUT_KEY_UP:
-            rot = 1;
-            rotz = 0;
-            rotx = 1;
-            roty = 0;
+            
             break;
         case GLUT_KEY_DOWN:
             rot = 0;
             rotz = 0;
             rotx = 0;
             roty = 0;
+            zoom = 0;
+            break;
+        case 119: // 'w' key
+            zoom = (zoom < 0) ? 0 : .1;
+            break;
+        case 115: // 's' key
+            zoom = (zoom > 0) ? 0 : -.1;
             break;
         case 27: // Escape key to Quit
             glutDestroyWindow ( glutGetWindow() );
             exit (0);
             break;
         case GLUT_KEY_F1: // F1 to restart
-            //            plate.setInitialCondition();
             plate.addStrike();
             break;
     }
@@ -87,16 +181,30 @@ void display ()
 //==============================================================================
 void init ()
 {
-    glEnable (GL_DEPTH_TEST|GL_COLOR_MATERIAL);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_DEPTH_TEST);
-
+//    glDepthFunc(GL_LESS);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
     gluPerspective (45.0, 1.0, 1.0, 250.0);
-    gluLookAt ( -45.0,   45.0, 45.0,// eye
+    gluLookAt ( currentEyeX,   currentEyeY, currentEyeZ,// eye
                0.0,   0.0,    0.0,  // centre
                0.0,   1.0,   0.0);  // up
+    
+    // Initialize GLEW
+//    glewExperimental = GL_TRUE; // Needed for core profile
+//    
+//    GLuint vertexbuffer;
+//    GLuint VertexArrayID;
+//    glGenVertexArrays(1, &VertexArrayID);
+//    glBindVertexArray(VertexArrayID);
+//    
+//    // set shader
+//    const char vertShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleVertexShader.vertexshader";
+//    const char fragShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleFragmentShader.fragmentshader";
+//    programID = LoadShaders( vertShade, fragShade );
+//    
+//    glGenBuffers(1, &vertexbuffer);
+//    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 }
 
 //==============================================================================
@@ -106,17 +214,16 @@ void init ()
 int main (int argc, char* argv[])
 {
     plate.setup (44100, true);
-    plate.setLoss(1, .9);
+    plate.setLoss(.2, .9);
     plate.setInitialCondition();
+    
     glutInit (&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 800);
     glutCreateWindow ("Finite Difference Plate");
     glutDisplayFunc (display);
-
     glutSpecialFunc (key);
     init ();
-//    PointLight(-45.5,45.5,45.5, .3, 10, 10);
     glutMainLoop ();
     return 0;
 }
@@ -124,12 +231,23 @@ int main (int argc, char* argv[])
 //==============================================================================
 //==============================================================================
 //==============================================================================
+
 void draw ()
 {
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glRasterPos3f(-8.5, 20, 0);
+    // Clear the screen
+    glClear( GL_COLOR_BUFFER_BIT );
+    //==========================================================================
+    //  Translation
+    //==========================================================================
+    glRotatef (rot, rotx, roty, rotz);
+    glTranslatef(zoom, zoom, zoom);
     
-    const unsigned char string[] = "FDTD Thin Plate: Press F1 to Strike, esc to quit";
+    //==========================================================================
+    //  Text
+    //==========================================================================
+    glColor4f(.7f, .7f, .7f, 0.0f);
+    glRasterPos3f(-8.5, 20, 0);
+    const unsigned char string[] = "Press F1 to Strike, esc to quit";
     for (const unsigned char* c = string; *c != '\0'; c++)
     {
         glutBitmapCharacter (GLUT_BITMAP_8_BY_13, *c);
@@ -138,22 +256,8 @@ void draw ()
     //==========================================================================
     //  Axis
     //==========================================================================
-    
-    glColor4f(.3f, .3f, .3f, 1.0f);
-    glBegin (GL_LINES);
-    //x
-    glVertex3f (0., 0., 0.);
-    glVertex3f (10., 0., 0.);
-    //y
-    glVertex3f (0., 0., 0.);
-    glVertex3f (0., 10., 0.);
-    //z
-    glVertex3f (0., 0., 0.);
-    glVertex3f (0., 0., 10.);
-    
-    glEnd();
-    
-    
+    glColor4f(.4f, .4f, .4f, .4f);
+    drawAxes(10.);
     //==========================================================================
     
     //==========================================================================
@@ -161,18 +265,10 @@ void draw ()
     plate.updateScheme();
     const int xPointNum = plate.Nx;
     const int zPointNum = plate.Ny;
-    double* plateSurf = plate.u1;
+    const double* plateSurf = plate.u1;
     //==========================================================================
-    
-    // This code will loop over all points on the plate.
-    // It creates a mesh by drawing adjacent points together (GL_LINE_STRIP)
-    // TODO: use shading along with GL_QUADS to create a coloured surface
-    
-    // NOTE: centre of the window is (0,0,0) so X and Z must be adjusted
-    // hence surfX and surfZ
-    
-    glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-    glRotatef (rot, rotx, roty, rotz);
+  
+    glLineWidth(2.f);
     const float amp =  5e4;
     for (int x = 0; x < xPointNum; ++x)
     {
@@ -196,35 +292,45 @@ void draw ()
                                     static_cast<float>(amp*plateSurf[cp+1]),
                                     surfZ};
             
+            // Surface
+            glColor4f((p1[1]*.05)+.5, 0, 1-(p1[1]*.02), 0);
+            drawTriangle(p1, p2, p4);
+            drawTriangle(p3, p2, p4);
             
-            glColor4f(.15, .15, .15, .1);
-            glBegin (GL_LINE_LOOP);
-            glVertex3fv (p1);
-            glVertex3fv (p2);
-            glVertex3fv (p3);
-            glVertex3fv (p4);
-            glEnd ();
+            // Mesh
+            glColor4f(.5, .5, .5, 0);
+            glColor4f(.1, .1, .1, 0);
+            drawQuad(p1, p2, p3, p4);
             
-            glColor4f((p1[1]*.05)+.5, 0, 1-(p1[1]*.02), .5-(p1[1]*.02));
-            glBegin (GL_QUADS);
-            glVertex3fv (p1);
-            glVertex3fv (p2);
-            glVertex3fv (p3);
-            glVertex3fv (p4);
-            glEnd ();
-            
-            // Calculate Normals
-            const GLfloat v1[3] = {p2[0]-p1[0],p2[1]-p1[1],p2[1]-p1[0]};
-            const GLfloat v2[3] = {p4[0]-p3[0],p4[1]-p3[1],p4[1]-p3[0]};
-            
-            const GLfloat currentNorm[3] = { (v1[1]*v2[2] - v2[1]*v1[2]),
-                -(v1[0]*v2[2] - v2[0]*v1[2]),
-                (v1[0]*v2[1] - v2[0]*v1[1])};
-            
-            glNormal3fv(currentNorm);
+            // Normal
+            const GLfloat* currentNorm1 = getTriNormal (p1, p2, p4);
+            glNormal3fv(currentNorm1);
+            const GLfloat* currentNorm2 = getTriNormal (p3, p2, p4);
+            glNormal3fv(currentNorm2);
         }
     }
     
+    
+    // Use our shader
+//    glUseProgram(programID);
+//    
+//    // first attribute buffer : vertices
+//    glEnableVertexAttribArray(0);
+//    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+//    glVertexAttribPointer(
+//                          0,        // attribute 0. No particular reason for 0, but must match the layout in the shader.
+//                          3,        // size
+//                          GL_FLOAT, // type
+//                          GL_FALSE, // normalized?
+//                          0,        // stride
+//                          nullptr  // array buffer offset
+//                          );
+//    glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
+//    glDisableVertexAttribArray(0);
+//    
+    
     glutPostRedisplay ();
 }
+
+//==============================================================================
 
