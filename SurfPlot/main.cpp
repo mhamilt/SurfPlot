@@ -18,21 +18,21 @@
 #include <cmath>
 #include <cstring>
 
-#include <GL/glew.h>
-#include <glfw3.h>
+//#include <OpenGL/glew.h>
+//#include <glfw3.h>
 //#include <OpenGL/gl3.h>
 
 // Include GLM
 //#include <glm/glm.hpp>
 
 //GLUT versions
-//#include <GL/freeglut.h>
+#include <GL/freeglut.h>
 //#include <GL/glut.h>
-#include <GLUT/glut.h>
+//#include <GLUT/glut.h>
 
 //
 #include "../FDTD_Classes/FDPlate.hpp"
-#include "../common/shader.hpp"
+//#include "../common/shader.hpp"
 //==============================================================================
 // Global scope for these is not ideal
 // consider bundling this and other methods in a class.
@@ -43,12 +43,12 @@ float zoom = 0;
 GLfloat currentEyeX = 45., currentEyeY = 45., currentEyeZ = 45.;
 
 //==============================================================================
-static const GLfloat g_vertex_buffer_data[] =
-{
-    -1.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
-    0.0f,  1.0f, 0.0f,
-};
+//static const GLfloat g_vertex_buffer_data[] =
+//{
+//    -1.0f, -1.0f, 0.0f,
+//    1.0f, -1.0f, 0.0f,
+//    0.0f,  1.0f, 0.0f,
+//};
 
 GLuint vertexbuffer;
 GLuint VertexArrayID;

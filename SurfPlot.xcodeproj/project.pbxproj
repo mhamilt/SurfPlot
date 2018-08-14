@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		841216D7203F238C00D50E8F /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 841216D1203F10C400D50E8F /* shader.cpp */; };
 		84CA7F472037100800307BBB /* FDPlate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84CA7F432037100800307BBB /* FDPlate.cpp */; };
 		84CA7F482037100800307BBB /* FDString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84CA7F452037100800307BBB /* FDString.cpp */; };
 		84ED383D1F97D1F100DBF3BC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 84ED383C1F97D1F100DBF3BC /* main.cpp */; };
@@ -179,7 +178,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				841216D7203F238C00D50E8F /* shader.cpp in Sources */,
 				84CA7F482037100800307BBB /* FDString.cpp in Sources */,
 				84CA7F472037100800307BBB /* FDPlate.cpp in Sources */,
 				84ED383D1F97D1F100DBF3BC /* main.cpp in Sources */,
@@ -290,8 +288,6 @@
 					OpenGL,
 					"-framework",
 					OpenGL,
-					"/Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/external/glfw-3.1.2/src/Debug/libglfw3.a",
-					/Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/external/Debug/libGLEW_1130.a,
 					"-framework",
 					Cocoa,
 					"-framework",
@@ -304,7 +300,7 @@
 					CoreVideo,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "/opt/X11/include /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glew-1.13.0/include /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glfw-3.1.2/include/GLFW /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glm-0.9.7.1";
+				USER_HEADER_SEARCH_PATHS = /opt/X11/include;
 			};
 			name = Debug;
 		};
@@ -319,8 +315,6 @@
 					OpenGL,
 					"-framework",
 					OpenGL,
-					"/Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/external/glfw-3.1.2/src/Release/libglfw3.a",
-					/Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/external/Release/libGLEW_1130.a,
 					"-framework",
 					Cocoa,
 					"-framework",
@@ -333,7 +327,7 @@
 					CoreVideo,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "/opt/X11/include /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glew-1.13.0/include /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glfw-3.1.2/include/GLFW /Users/admin/Documents/Developing/OpenGL/OpenGLTutorials/ogl-master/external/glm-0.9.7.1";
+				USER_HEADER_SEARCH_PATHS = /opt/X11/include;
 			};
 			name = Release;
 		};
