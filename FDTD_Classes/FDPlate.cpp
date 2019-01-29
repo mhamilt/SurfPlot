@@ -248,12 +248,12 @@ void FDPlate::updateScheme()
 		{
 			cp = (yi+2)+((xi+2) * Ny); // current point
 			
-			u[cp] = B00*u1[cp] +
+			u[cp] = tanh (B00*u1[cp] +
 			B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
 			B02*( u1[cp-2] + u1[cp+2] +u1[cp-(2*Ny)] + u1[cp+(2*Ny)] ) +
 			B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
 			C00*u2[cp] +
-			C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
+			C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] ));
 		}
 	}
 	
@@ -264,21 +264,21 @@ void FDPlate::updateScheme()
 	{
 		//North
 		cp = 1+((xi+2) * Ny); // current point
-		u[cp]  = BC1*u1[cp] +
+		u[cp]  =tanh( BC1*u1[cp] +
 		B01*( u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
 		B02*( u1[cp-2] + u1[cp+2] + u1[cp-(2*Ny)] + u1[cp+(2*Ny)] ) +
 		B11*( u1[cp+1-Ny] + u1[cp+1+Ny] ) +
 		C00*u2[cp] +
-		C01*( u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
+		C01*( u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] ));
 		
 		//South
 		cp = Ny-2 +((xi+2) * Ny); // current point
-		u[cp]  = BC1*u1[cp] +
+		u[cp]  = tanh( BC1*u1[cp] +
 		B01*( u1[cp-1] + u1[cp-Ny] + u1[cp+Ny] ) +
 		B02*( u1[cp-2] + u1[cp-(2*Ny)] + u1[cp+(2*Ny)] ) +
 		B11*( u1[cp-1-Ny] + u1[cp-1+Ny] ) +
 		C00*u2[cp] +
-		C01*( u2[cp-1] + u2[cp-Ny] + u2[cp+Ny] );
+		C01*( u2[cp-1] + u2[cp-Ny] + u2[cp+Ny] ));
 	}
 	
 	// Y-Axis
@@ -287,56 +287,34 @@ void FDPlate::updateScheme()
 	{
 		//West
 		cp = yi+Ny+2; // current point
-		u[cp]  = BC1*u1[cp] +
+		u[cp]  = tanh( BC1*u1[cp] +
 		B01*( u1[cp-1] + u1[cp+1] + u1[cp+Ny] ) +
 		B02*( u1[cp-2] + u1[cp+2] + u1[cp+(2*Ny)] ) +
 		B11*( u1[cp+1+Ny] + u1[cp-1+Ny] ) +
 		C00*u2[cp] +
-		C01*( u2[cp-1] + u2[cp+1] + u2[cp+Ny] );
+		C01*( u2[cp-1] + u2[cp+1] + u2[cp+Ny] ));
 		
 		//East
 		cp = (yi+2) + Ny*(Nx-2); // current point
-		u[cp]  = BC1*u1[cp] +
+		u[cp]  = tanh( BC1*u1[cp] +
 		B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] ) +
 		B02*( u1[cp-2] + u1[cp+2] +u1[cp-(2*Ny)] ) +
 		B11*( u1[cp-1-Ny] + u1[cp+1-Ny] ) +
 		C00*u2[cp] +
-		C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] );
+		C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] ));
 	}
 	
 	// Corner Boundaries
-	
-	cp = Ny+1;
-	u[cp] = BC2*u1[cp] +
-	B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
-	B02*( u1[cp+2] + u1[cp+(2*Ny)] ) +
-	B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
-	C00*u2[cp] +
-	C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
-	
-	cp = 2*(Ny-1);
-	u[cp] = BC2*u1[cp] +
-	B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
-	B02*( u1[cp-2] + u1[cp+(2*Ny)] ) +
-	B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
-	C00*u2[cp] +
-	C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
-	
-	cp = Ny*(Nx-2)+1;
-	u[cp] = BC2*u1[cp] +
-	B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
-	B02*( u1[cp+2] + u1[cp-(2*Ny)] ) +
-	B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
-	C00*u2[cp] +
-	C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
-	
-	cp = Ny*(Nx-1) - 2;
-	u[cp] = BC2*u1[cp] +
-	B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
-	B02*( u1[cp-2] + u1[cp-(2*Ny)] ) +
-	B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
-	C00*u2[cp] +
-	C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] );
+    const int c[4] = {(Ny+1),(2*(Ny-1)),Ny*(Nx-2)+1,Ny*(Nx-1) - 2};
+    for (int i = 0; i < 4; ++i) {
+        cp = c[i];
+        u[cp] = tanh(BC2*u1[cp] +
+                     B01*( u1[cp-1] + u1[cp+1] + u1[cp-Ny] + u1[cp+Ny] ) +
+                     B02*( u1[cp+2] + u1[cp+(2*Ny)] ) +
+                     B11*( u1[cp-1-Ny] + u1[cp+1-Ny] +u1[cp+1+Ny] + u1[cp-1+Ny] ) +
+                     C00*u2[cp] +
+                     C01*( u2[cp-1] + u2[cp+1] + u2[cp-Ny] + u2[cp+Ny] ));
+    }
 	
 	// swap pointers
 	dummyptr = u2; u2 = u1; u1 = u; u = dummyptr;
@@ -480,7 +458,7 @@ void FDPlate::addForce (double force)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void FDPlate::addStrike()
+void FDPlate::addStrike(double forceMagnitude)
 {
 	//TODO: Function to add a 2D rasied cosine multiplied by a gain rc in
 	// displacement, dependent on strike velocity
@@ -490,7 +468,7 @@ void FDPlate::addStrike()
 	
     for (int i = 0; i < rcIndex.size(); ++i)
     {
-        u1[rcIndex[i]] += k*rcValue[i];
+        u1[rcIndex[i]] += k*rcValue[i] * forceMagnitude;
     }
     
 	// Need to work out in advance which indeces will actually be affected by a strike.

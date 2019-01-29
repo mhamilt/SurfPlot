@@ -133,7 +133,7 @@ public:
 	/**
 	 Under construction: will add a strike to the plate.
 	 */
-	void addStrike();
+	void addStrike(double forceMagnitude);
     //==============================================================================
 	/**
 	 <#Description#>

@@ -26,9 +26,9 @@
 //#include <glm/glm.hpp>
 
 //GLUT versions
-#include <GL/freeglut.h>
+//#include <GL/freeglut.h>
 //#include <GL/glut.h>
-//#include <GLUT/glut.h>
+#include <GLUT/glut.h>
 
 //
 #include "../FDTD_Classes/FDPlate.hpp"
@@ -57,7 +57,7 @@ GLuint programID;
 
 /**
  Get the 3D normal of a triangular plane from it's three vertices
-
+ 
  @return the triangle normal as a pointer to a GLfloat array with 3 elements
  */
 GLfloat* getTriNormal (const GLfloat* pointOne, const GLfloat* pointTwo, const GLfloat* pointThree)
@@ -108,18 +108,18 @@ void drawQuad (const GLfloat* pointOne, const GLfloat* pointTwo, const GLfloat* 
  */
 void drawAxes (const GLfloat length)
 {
-        glBegin (GL_LINES);
-        //x
-        glVertex3f (0., 0., 0.);
-        glVertex3f (length, 0., 0.);
-        //y
-        glVertex3f (0., 0., 0.);
-        glVertex3f (0., length, 0.);
-        //z
-        glVertex3f (0., 0., 0.);
-        glVertex3f (0., 0., length);
-        
-        glEnd();
+    glBegin (GL_LINES);
+    //x
+    glVertex3f (0., 0., 0.);
+    glVertex3f (length, 0., 0.);
+    //y
+    glVertex3f (0., 0., 0.);
+    glVertex3f (0., length, 0.);
+    //z
+    glVertex3f (0., 0., 0.);
+    glVertex3f (0., 0., length);
+    
+    glEnd();
 }
 
 //==============================================================================
@@ -128,44 +128,86 @@ static void key (int key, int x, int y)
     switch (key)
     {
         case GLUT_KEY_LEFT:
-            rot = -1;
-            rotx = 0;
-            rotz = 0;
-            roty = 1;
-            break;
-            
+        rot = -1;
+        rotx = 0;
+        rotz = 0;
+        roty = 1;
+        break;
+        
         case GLUT_KEY_RIGHT:
-            rot = 1;
-            roty = 1;
-            rotz = 0;
-            rotx = 0;
-            break;
-            
+        rot = 1;
+        roty = 1;
+        rotz = 0;
+        rotx = 0;
+        break;
+        
         case GLUT_KEY_UP:
-            
-            break;
+        
+        break;
         case GLUT_KEY_DOWN:
-            rot = 0;
-            rotz = 0;
-            rotx = 0;
-            roty = 0;
-            zoom = 0;
-            break;
-        case 119: // 'w' key
-            zoom = (zoom < 0) ? 0 : .1;
-            break;
-        case 115: // 's' key
-            zoom = (zoom > 0) ? 0 : -.1;
-            break;
-        case 27: // Escape key to Quit
-            glutDestroyWindow ( glutGetWindow() );
-            exit (0);
-            break;
-        case GLUT_KEY_F1: // F1 to restart
-            plate.addStrike();
-            break;
+        rot = 0;
+        rotz = 0;
+        rotx = 0;
+        roty = 0;
+        zoom = 0;
+        break;
     }
     glutPostRedisplay();
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+    switch((char)key)
+    {
+        case ' ':
+        plate.addStrike(10.);
+        break;
+        case 'w': // 'w' key
+        zoom = (zoom < 0) ? 0 : .1;
+        break;
+        case 's': // 's' key
+        zoom = (zoom > 0) ? 0 : -.1;
+        break;
+        case 'q':
+        glutDestroyWindow (glutGetWindow());
+        exit(0);
+        default:
+        break;
+    }
+    
+    return;
+}
+
+void keyboardUp(int key, int x, int y)
+{
+    switch (key)
+    {
+        case GLUT_KEY_LEFT:
+        rot = 0;
+        rotx = 0;
+        rotz = 0;
+        roty = 0;
+        break;
+        
+        case GLUT_KEY_RIGHT:
+        rot = 0;
+        roty = 0;
+        rotz = 0;
+        rotx = 0;
+        break;
+        
+        case GLUT_KEY_UP:
+        
+        break;
+        case GLUT_KEY_DOWN:
+        rot = 0;
+        rotz = 0;
+        rotx = 0;
+        roty = 0;
+        zoom = 0;
+        break;
+    }
+    return;
 }
 
 //==============================================================================
@@ -181,7 +223,7 @@ void display ()
 //==============================================================================
 void init ()
 {
-//    glDepthFunc(GL_LESS);
+    //    glDepthFunc(GL_LESS);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
     gluPerspective (45.0, 1.0, 1.0, 250.0);
@@ -190,21 +232,21 @@ void init ()
                0.0,   1.0,   0.0);  // up
     
     // Initialize GLEW
-//    glewExperimental = GL_TRUE; // Needed for core profile
-//    
-//    GLuint vertexbuffer;
-//    GLuint VertexArrayID;
-//    glGenVertexArrays(1, &VertexArrayID);
-//    glBindVertexArray(VertexArrayID);
-//    
-//    // set shader
-//    const char vertShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleVertexShader.vertexshader";
-//    const char fragShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleFragmentShader.fragmentshader";
-//    programID = LoadShaders( vertShade, fragShade );
-//    
-//    glGenBuffers(1, &vertexbuffer);
-//    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    //    glewExperimental = GL_TRUE; // Needed for core profile
+    //
+    //    GLuint vertexbuffer;
+    //    GLuint VertexArrayID;
+    //    glGenVertexArrays(1, &VertexArrayID);
+    //    glBindVertexArray(VertexArrayID);
+    //
+    //    // set shader
+    //    const char vertShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleVertexShader.vertexshader";
+    //    const char fragShade[] = "/Users/admin/Documents/GitHub/SurfPlot/shaders/SimpleFragmentShader.fragmentshader";
+    //    programID = LoadShaders( vertShade, fragShade );
+    //
+    //    glGenBuffers(1, &vertexbuffer);
+    //    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    //    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 }
 
 //==============================================================================
@@ -214,7 +256,7 @@ void init ()
 int main (int argc, char* argv[])
 {
     plate.setup (44100, true);
-    plate.setLoss(.2, .9);
+    plate.setLoss(10.0, .05);
     plate.setInitialCondition();
     
     glutInit (&argc, argv);
@@ -222,6 +264,8 @@ int main (int argc, char* argv[])
     glutInitWindowSize(800, 800);
     glutCreateWindow ("Finite Difference Plate");
     glutDisplayFunc (display);
+    glutKeyboardFunc(keyboard);
+    glutSpecialUpFunc(keyboardUp);
     glutSpecialFunc (key);
     init ();
     glutMainLoop ();
@@ -247,7 +291,7 @@ void draw ()
     //==========================================================================
     glColor4f(.7f, .7f, .7f, 0.0f);
     glRasterPos3f(-8.5, 20, 0);
-    const unsigned char string[] = "Press F1 to Strike, esc to quit";
+    const unsigned char string[] = "Press Spacebar to Strike. Press esc to quit";
     for (const unsigned char* c = string; *c != '\0'; c++)
     {
         glutBitmapCharacter (GLUT_BITMAP_8_BY_13, *c);
@@ -262,14 +306,17 @@ void draw ()
     
     //==========================================================================
     // none of this is ideal
-    plate.updateScheme();
+    for (int i = 0; i < 2 ; ++i)
+    {
+        plate.updateScheme();
+    }
     const int xPointNum = plate.Nx;
     const int zPointNum = plate.Ny;
     const double* plateSurf = plate.u1;
     //==========================================================================
-  
+    
     glLineWidth(2.f);
-    const float amp =  5e4;
+    const float amp =  2e3;
     for (int x = 0; x < xPointNum; ++x)
     {
         const float surfX = (float)x - ((float)xPointNum*.5);
@@ -277,20 +324,20 @@ void draw ()
         {
             const float surfZ = (float)z - ((float)zPointNum*.5);
             const int cp =  int(x + (z * zPointNum));
-
+            
             // Mesh Points
             const GLfloat p1[3] = { surfX,
-                                    static_cast<float>(amp*plateSurf[cp]),
-                                    surfZ};
+                static_cast<float>(amp*plateSurf[cp]),
+                surfZ};
             const GLfloat p2[3] = { surfX,
-                                    static_cast<float>(amp*plateSurf[cp+zPointNum]),
-                                    surfZ+1};
+                static_cast<float>(amp*plateSurf[cp+zPointNum]),
+                surfZ+1};
             const GLfloat p3[3] = { surfX+1,
-                                    static_cast<float>(amp*plateSurf[cp+zPointNum+1]),
-                                    surfZ+1};
+                static_cast<float>(amp*plateSurf[cp+zPointNum+1]),
+                surfZ+1};
             const GLfloat p4[3] = { surfX+1,
-                                    static_cast<float>(amp*plateSurf[cp+1]),
-                                    surfZ};
+                static_cast<float>(amp*plateSurf[cp+1]),
+                surfZ};
             
             // Surface
             glColor4f((p1[1]*.05)+.5, 0, 1-(p1[1]*.02), 0);
@@ -312,23 +359,24 @@ void draw ()
     
     
     // Use our shader
-//    glUseProgram(programID);
-//    
-//    // first attribute buffer : vertices
-//    glEnableVertexAttribArray(0);
-//    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-//    glVertexAttribPointer(
-//                          0,        // attribute 0. No particular reason for 0, but must match the layout in the shader.
-//                          3,        // size
-//                          GL_FLOAT, // type
-//                          GL_FALSE, // normalized?
-//                          0,        // stride
-//                          nullptr  // array buffer offset
-//                          );
-//    glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
-//    glDisableVertexAttribArray(0);
-//    
-    
+    //    glUseProgram(programID);
+    //
+    //    // first attribute buffer : vertices
+    //    glEnableVertexAttribArray(0);
+    //    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    //    glVertexAttribPointer(
+    //                          0,        // attribute 0. No particular reason for 0, but must match the layout in the shader.
+    //                          3,        // size
+    //                          GL_FLOAT, // type
+    //                          GL_FALSE, // normalized?
+    //                          0,        // stride
+    //                          nullptr  // array buffer offset
+    //                          );
+    //    glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
+    //    glDisableVertexAttribArray(0);
+    //
+    glEnd();
+    glFlush();
     glutPostRedisplay ();
 }
 
